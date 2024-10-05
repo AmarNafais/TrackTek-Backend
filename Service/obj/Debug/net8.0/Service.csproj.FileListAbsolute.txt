@@ -1,0 +1,11 @@
+C:\Workspace\TrackTek\core-api\Service\bin\Debug\net8.0\Service.deps.json
+C:\Workspace\TrackTek\core-api\Service\bin\Debug\net8.0\Service.dll
+C:\Workspace\TrackTek\core-api\Service\bin\Debug\net8.0\Service.pdb
+C:\Workspace\TrackTek\core-api\Service\obj\Debug\net8.0\Service.GeneratedMSBuildEditorConfig.editorconfig
+C:\Workspace\TrackTek\core-api\Service\obj\Debug\net8.0\Service.AssemblyInfoInputs.cache
+C:\Workspace\TrackTek\core-api\Service\obj\Debug\net8.0\Service.AssemblyInfo.cs
+C:\Workspace\TrackTek\core-api\Service\obj\Debug\net8.0\Service.csproj.CoreCompileInputs.cache
+C:\Workspace\TrackTek\core-api\Service\obj\Debug\net8.0\Service.dll
+C:\Workspace\TrackTek\core-api\Service\obj\Debug\net8.0\refint\Service.dll
+C:\Workspace\TrackTek\core-api\Service\obj\Debug\net8.0\Service.pdb
+C:\Workspace\TrackTek\core-api\Service\obj\Debug\net8.0\ref\Service.dll
