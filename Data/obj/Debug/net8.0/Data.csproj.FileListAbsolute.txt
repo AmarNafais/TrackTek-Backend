@@ -12,3 +12,4 @@ C:\Workspace\TrackTek\core-api\Data\obj\Debug\net8.0\refint\Data.dll
 C:\Workspace\TrackTek\core-api\Data\obj\Debug\net8.0\Data.pdb
 C:\Workspace\TrackTek\core-api\Data\obj\Debug\net8.0\Data.genruntimeconfig.cache
 C:\Workspace\TrackTek\core-api\Data\obj\Debug\net8.0\ref\Data.dll
+C:\Workspace\TrackTek\core-api\Data\obj\Debug\net8.0\Data.sourcelink.json

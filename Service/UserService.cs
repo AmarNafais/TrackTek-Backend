@@ -5,115 +5,61 @@ namespace Services;
 public interface IUserService
 {
     void CreateUser(User user);
-    object GetUserById(long id);
+    object GetUserById(int id);
     object GetAllUsers();
     void UpdateUser(User user);
 }
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _UserRepository;
+    private readonly IUserRepository _userRepository;
 
-    public AccessUserService(IAccessUserRepository accessuserRepository, IUserContext userContext)
+    public UserService(IUserRepository userRepository)
     {
-        _accessUserRepository = accessuserRepository;
-        _userContext = userContext;
+        _userRepository = userRepository;
     }
 
-    public void CreateAccessUser(AccessUserCreationContract contract)
+    public void CreateUser(User user)
     {
-        if (_userContext.UserRole == nameof(UserRoleTypeValue.SuperAdmin))
+        var newUser = new User()
         {
-            throw new AccessDeniedException();
-        }
-        else
-        {
-            Enum.TryParse(contract.IdType, out IdTypeValue idType);
-            Enum.TryParse(contract.Purpose, out PurposeTypeValue purposeType);
-
-            var newAccessUser = new AccessUser()
-            {
-                Title = contract.Title,
-                FirstName = contract.FirstName,
-                LastName = contract.LastName,
-                IdNumber = contract.IdNumber,
-                IdType = idType,
-                Email = contract.Email,
-                CountryCode = contract.CountryCode,
-                PhoneNumber = contract.PhoneNumber,
-                Purpose = purposeType,
-                TenantId = _userContext.CurrentUserTenantId,
-            };
-            _accessUserRepository.Add(newAccessUser);
-        }
+            Name = user.Name,
+            Email = user.Email,
+        };
+        _userRepository.AddUser(newUser);
     }
 
-    public object GetAccessUserById(long id)
+    public object GetUserById(int id)
     {
-        var accessUser = _accessUserRepository.GetById(id);
+        var user = _userRepository.GetByUserId(id);
         return new
         {
-            accessUser.Id,
-            accessUser.Title,
-            accessUser.FirstName,
-            accessUser.LastName,
-            accessUser.IdType,
-            accessUser.IdNumber,
-            accessUser.Email,
-            accessUser.CountryCode,
-            accessUser.PhoneNumber,
-            accessUser.Purpose,
-            accessUser.TenantId
+            user.Id,
+            user.Name,
+            user.Email,
         };
     }
 
-    public object GetAllAccessUsers()
+    public object GetAllUsers()
     {
-        IEnumerable<AccessUser> accessUsers;
-
-        if (_userContext.UserRole == nameof(UserRoleTypeValue.SuperAdmin))
+        var users = _userRepository.GetAllUsers();
+        return users.Select(user => new
         {
-            accessUsers = _accessUserRepository.GetAll();
-        }
-        else
-        {
-            var tenantId = _userContext.CurrentUserTenantId;
-            accessUsers = _accessUserRepository.GetAll().Where(x => x.TenantId == tenantId);
-        }
-        return accessUsers.Select(accessUser => new
-        {
-            accessUser.Id,
-            accessUser.Title,
-            accessUser.FirstName,
-            accessUser.LastName,
-            accessUser.IdNumber,
-            accessUser.Email,
-            accessUser.CountryCode,
-            accessUser.PhoneNumber,
-            accessUser.Purpose,
+            user.Id,
+            user.Name,
+            user.Email,
         });
     }
 
-    public void UpdateAccessUser(AccessUserUpdateContract contract)
+    public void UpdateUser(User user)
     {
-        Enum.TryParse(contract.IdType, out IdTypeValue idType);
-        Enum.TryParse(contract.Purpose, out PurposeTypeValue purposeType);
-
-        var updateAccessUser = new AccessUser()
+        var updateUser = new User()
         {
-            Id = contract.AccessUserId,
-            Title = contract.Title,
-            FirstName = contract.FirstName,
-            LastName = contract.LastName,
-            IdType = idType,
-            IdNumber = contract.IdNumber,
-            Email = contract.Email,
-            CountryCode = contract.CountryCode,
-            PhoneNumber = contract.PhoneNumber,
-            Purpose = purposeType,
-            TenantId = _userContext.CurrentUserTenantId,
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
         };
 
-        _accessUserRepository.Update(updateAccessUser);
+        _userRepository.UpdateUser(updateUser);
     }
 }
