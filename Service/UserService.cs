@@ -8,6 +8,7 @@ public interface IUserService
     object GetUserById(int id);
     object GetAllUsers();
     void UpdateUser(User user);
+    User GetUserByEmailAndPassword(string email, string password);
 }
 
 public class UserService : IUserService
@@ -61,5 +62,18 @@ public class UserService : IUserService
         };
 
         _userRepository.UpdateUser(updateUser);
+    }
+    public User GetUserByEmailAndPassword(string email, string password)
+    {
+        var user = _userRepository.GetAllUsers()
+            .FirstOrDefault(u => u.Email == email);
+
+        if (user == null)
+            return null;
+
+        if (user.Password == password)
+            return user;
+
+        return null;
     }
 }

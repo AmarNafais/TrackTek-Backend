@@ -5,6 +5,7 @@ using Services;
 namespace Web.Controllers;
 
 [ApiController]
+[Authorize]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
@@ -74,5 +75,4 @@ public class UserController : Controller
             return NotFound(ex.Message);
         }
     }
-
 }
