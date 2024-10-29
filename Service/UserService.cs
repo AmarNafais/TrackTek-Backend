@@ -3,13 +3,9 @@ using Data.Entities.Enums;
 using Data.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Service.DTOs;
-using System.Diagnostics.Contracts;
-using System.Security.Cryptography;
-using System.Text;
 
 public interface IUserService
 {
-    void CreateUser(CreateUserDTO userDto);
     object GetUserById(int id);
     object GetAllUsers();
     void UpdateUser(UpdateUserDTO userDto);
@@ -19,31 +15,12 @@ public interface IUserService
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IEmailService _emailService;
     private readonly IPasswordHasher<User> _passwordHasher;
 
-    public UserService(IUserRepository userRepository, IEmailService emailService, IPasswordHasher<User> passwordHasher)
+    public UserService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher)
     {
         _userRepository = userRepository;
-        _emailService = emailService;
         _passwordHasher = passwordHasher;
-    }
-
-    public void CreateUser(CreateUserDTO userDto)
-    {
-        var generatedPassword = GenerateRandomPassword(8);
-        Enum.TryParse(userDto.Role, out UserRole userRole);
-        var newUser = new User()
-        {
-            FirstName = userDto.FirstName,
-            LastName = userDto.LastName,
-            Email = userDto.Email,
-            Role = userRole,
-            Password = _passwordHasher.HashPassword(new User(), generatedPassword)
-        };
-
-        _emailService.SendWelcomeEmail(newUser, generatedPassword);
-        _userRepository.AddUser(newUser);
     }
 
     public object GetUserById(int id)
@@ -55,7 +32,7 @@ public class UserService : IUserService
             user.FirstName,
             user.LastName,
             user.Email,
-            user.Role
+            Role = user.Role.ToString()
         };
     }
 
@@ -68,7 +45,7 @@ public class UserService : IUserService
             user.FirstName,
             user.LastName,
             user.Email,
-            user.Role
+            Role = user.Role.ToString()
         });
     }
 
@@ -95,22 +72,5 @@ public class UserService : IUserService
         if (passwordVerificationResult == PasswordVerificationResult.Success)
             return user;
         return null;
-    }
-
-    private string GenerateRandomPassword(int length)
-    {
-        const string validCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        var password = new StringBuilder();
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            var byteArray = new byte[1];
-            for (int i = 0; i < length; i++)
-            {
-                rng.GetBytes(byteArray);
-                var randomIndex = byteArray[0] % validCharacters.Length;
-                password.Append(validCharacters[randomIndex]);
-            }
-        }
-        return password.ToString();
     }
 }

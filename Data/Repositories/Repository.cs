@@ -12,17 +12,15 @@ namespace Data.Repositories
 
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<User> Users { get; set; }
-
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Configure UserRole to be stored as a string in the database
             modelBuilder.Entity<User>()
                 .Property(u => u.Role)
                 .HasConversion(
-                    v => v.ToString(), // Convert enum to string for storage
-                    v => (UserRole)Enum.Parse(typeof(UserRole), v)); // Convert back to enum
+                    v => v.ToString(),
+                    v => (UserRole)Enum.Parse(typeof(UserRole), v));
         }
 
         public override int SaveChanges()

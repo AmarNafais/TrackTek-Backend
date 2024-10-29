@@ -7,6 +7,7 @@ public interface IEmailService
 {
     void SendEmail(string toEmail, string subject, string body);
     void SendWelcomeEmail(User user, string password);
+    void SendResetCodeEmail(User user, string resetCode);
 }
 
 public class EmailService : IEmailService
@@ -52,6 +53,19 @@ public class EmailService : IEmailService
             .Replace("{Name}", $"{user.FirstName} {user.LastName}")
             .Replace("{Email}", user.Email)
             .Replace("{Password}", password);
+
+        SendEmail(user.Email, template.Subject, body);
+    }
+    public void SendResetCodeEmail(User user, string resetCode)
+    {
+        var template = _repository.EmailTemplates
+            .FirstOrDefault(t => t.Name == "PasswordReset");
+
+        if (template == null) throw new Exception("Email template not found");
+
+        var body = template.Body
+            .Replace("{Name}", $"{user.FirstName} {user.LastName}")
+            .Replace("{ResetCode}", resetCode);
 
         SendEmail(user.Email, template.Subject, body);
     }
