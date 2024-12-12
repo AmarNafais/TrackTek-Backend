@@ -80,6 +80,8 @@ namespace Service
                 customerToBeUpdated.Address = updateCustomerDTO.Address;
                 customerToBeUpdated.IsActive = updateCustomerDTO.IsActive;
             }
+
+            _customerRepository.UpdateCustomer(customerToBeUpdated);
         }
 
         public void DeleteCustomer(int id)
