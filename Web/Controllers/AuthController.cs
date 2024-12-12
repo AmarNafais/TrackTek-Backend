@@ -1,46 +1,76 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Services;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Service.DTOs;
 
 [ApiController]
-[Route("v1/Auth")]
 public class AuthController : Controller
 {
-    private readonly IUserService _userService;
-    private readonly string _jwtKey;
+    private readonly IAuthService _authService;
 
-    public AuthController(IUserService userService, IConfiguration config)
+    public AuthController(IAuthService authService)
     {
-        _userService = userService;
-        _jwtKey = config["Jwt:Key"];
+        _authService = authService;
     }
 
-    [HttpPost("Login")]
+    [Route("v1/Auth/Login")]
+    [HttpPost]
     public IActionResult Login(string email, string password)
     {
-        var user = _userService.GetUserByEmailAndPassword(email, password);
-        if (user == null) return Unauthorized("Invalid credentials");
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtKey);
-
-        var tokenDescriptor = new SecurityTokenDescriptor
+        try
         {
-            Subject = new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email)
-            }),
-            Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
+            var token = _authService.AuthenticateUser(email, password);
+            return Ok(new { Token = token });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized("Invalid credentials");
+        }
+    }
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
+    [Route("v1/User/CreateUser")]
+    [HttpPost]
+    public IActionResult CreateUser(CreateUserDTO userDto)
+    {
+        try
+        {
+            _authService.CreateUser(userDto);
+            return Ok("User created successfully");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 
-        return Ok(new { Token = tokenString });
+    [Route("v1/Auth/RequestPasswordReset")]
+    [HttpPost]
+    public IActionResult RequestPasswordReset(string email)
+    {
+        try
+        {
+            _authService.RequestPasswordReset(email);
+            return Ok("Password reset code sent to your email.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Route("v1/Auth/ResetPassword")]
+    [HttpPost]
+    public IActionResult ResetPassword(string email, string newPassword, string confirmPassword, string code)
+    {
+        if (newPassword != confirmPassword)
+            return BadRequest("Passwords do not match.");
+
+        try
+        {
+            _authService.ResetPassword(email, newPassword, confirmPassword, code);
+            return Ok("Password has been reset successfully.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

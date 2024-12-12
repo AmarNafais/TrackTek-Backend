@@ -1,7 +1,6 @@
-﻿using Data.Entities;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Services;
+using Service.DTOs;
 namespace Web.Controllers;
 
 [ApiController]
@@ -13,22 +12,6 @@ public class UserController : Controller
     public UserController(IUserService userService)
     {
         _userService = userService;
-    }
-
-    [Route("v1/User/CreateUser")]
-    [HttpPost]
-    public IActionResult CreateAccessUser(User user)
-    {
-        try
-        {
-            _userService.CreateUser(user);
-            return Ok("User created successfully");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex);
-        }
-
     }
 
     [Route("v1/User/GetUserById")]
@@ -63,11 +46,11 @@ public class UserController : Controller
 
     [Route("v1/User/UpdateUser")]
     [HttpPost]
-    public IActionResult UpdateUser(User user)
+    public IActionResult UpdateUser(UpdateUserDTO userDto)
     {
         try
         {
-            _userService.UpdateUser(user);
+            _userService.UpdateUser(userDto);
             return Ok("User updated successfully");
         }
         catch (Exception ex)

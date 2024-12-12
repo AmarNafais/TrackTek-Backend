@@ -1,59 +1,63 @@
 ﻿using Data.Entities;
 
-namespace Data.Repositories;
-
-public interface IUserRepository
+namespace Data.Repositories
 {
-    long AddUser(User user);
-    User GetByUserId(long id);
-    IEnumerable<User> GetAllUsers();
-    void UpdateUser(User user);
-}
-
-public class UserRepository : IUserRepository
-{
-    private readonly Repository _repository;
-
-    public UserRepository(Repository repository)
+    public interface IUserRepository
     {
-        _repository = repository;
+        long AddUser(User user);
+        User GetByUserId(long id);
+        IEnumerable<User> GetAllUsers();
+        void UpdateUser(User user);
     }
 
-    public long AddUser(User user)
+    public class UserRepository : IUserRepository
     {
-        var isUserExists = _repository.Users.Select(b => new { b.Email }).ToList();
+        private readonly Repository _repository;
 
-        if (isUserExists.Any(b => b.Email == user.Email))
+        public UserRepository(Repository repository)
         {
-            throw new Exception("Email already exists!");
+            _repository = repository;
         }
-        else
+
+        public long AddUser(User user)
         {
+            var existingUser = _repository.Users.Any(b => b.Email == user.Email);
+
+            if (existingUser)
+            {
+                throw new InvalidOperationException("Email already exists!");
+            }
+
+            user.IsActive = true;
+
             _repository.Users.Add(user);
             _repository.SaveChanges();
             return user.Id;
         }
-    }
 
-    public User GetByUserId(long id)
-    {
-        return _repository.Users.FirstOrDefault(d => d.Id == id)
-                ?? throw new Exception(nameof(User));
-    }
+        public User GetByUserId(long id)
+        {
+            return _repository.Users.FirstOrDefault(d => d.Id == id)
+                   ?? throw new InvalidOperationException($"User with ID {id} not found.");
+        }
 
-    public IEnumerable<User> GetAllUsers()
-    {
-        return _repository.Users;
-    }
+        public IEnumerable<User> GetAllUsers()
+        {
+            return _repository.Users;
+        }
 
-    public void UpdateUser(User user)
-    {
-        var userToBeUpdated = _repository.Users.FirstOrDefault(x => x.Id == user.Id)
-            ?? throw new Exception(nameof(user));
+        public void UpdateUser(User user)
+        {
+            var userToBeUpdated = _repository.Users.FirstOrDefault(x => x.Id == user.Id)
+                                  ?? throw new InvalidOperationException($"User with ID {user.Id} not found.");
 
-        userToBeUpdated.Name = user.Name;
-        userToBeUpdated.Email = user.Email;
+            userToBeUpdated.FirstName = user.FirstName;
+            userToBeUpdated.LastName = user.LastName;
+            userToBeUpdated.Email = user.Email;
+            userToBeUpdated.Role = user.Role;
+            userToBeUpdated.IsActive = user.IsActive;
 
-        _repository.SaveChanges();
+            _repository.SaveChanges();
+        }
     }
 }

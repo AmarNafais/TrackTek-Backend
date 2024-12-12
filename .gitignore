@@ -1,0 +1,55 @@
+# Ignore Visual Studio files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore build directories
+bin/
+obj/
+
+# Ignore compiled files
+*.dll
+*.pdb
+*.exe
+*.vshost.exe
+*.dbmdl
+
+# Ignore ASP.NET Scaffolding
+Scaffolding/
+
+# Ignore JetBrains Rider files (if applicable)
+.idea/
+
+# Ignore NuGet packages
+*.nupkg
+
+# Ignore OS generated files (macOS, Windows)
+.DS_Store
+Thumbs.db
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.temp
+*.bak
+*.swp
+
+# Ignore coverage and test results
+coverage/
+test-results/
+
+# Ignore packages folder
+packages/
+
+# Ignore JetBrains ReSharper files
+_ReSharper/
+.idea/
+
+# Ignore user-specific files for other IDEs/editors
+*.iml
+*.sublime-workspace
+*.sublime-project

@@ -1,33 +1,26 @@
 ﻿using Data.Entities;
+using Data.Entities.Enums;
 using Data.Repositories;
-namespace Services;
+using Microsoft.AspNetCore.Identity;
+using Service.DTOs;
 
 public interface IUserService
 {
-    void CreateUser(User user);
     object GetUserById(int id);
     object GetAllUsers();
-    void UpdateUser(User user);
+    void UpdateUser(UpdateUserDTO userDto);
     User GetUserByEmailAndPassword(string email, string password);
 }
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, IPasswordHasher<User> passwordHasher)
     {
         _userRepository = userRepository;
-    }
-
-    public void CreateUser(User user)
-    {
-        var newUser = new User()
-        {
-            Name = user.Name,
-            Email = user.Email,
-        };
-        _userRepository.AddUser(newUser);
+        _passwordHasher = passwordHasher;
     }
 
     public object GetUserById(int id)
@@ -36,8 +29,11 @@ public class UserService : IUserService
         return new
         {
             user.Id,
-            user.Name,
+            user.FirstName,
+            user.LastName,
             user.Email,
+            Role = user.Role.ToString(),
+            user.IsActive
         };
     }
 
@@ -47,33 +43,37 @@ public class UserService : IUserService
         return users.Select(user => new
         {
             user.Id,
-            user.Name,
+            user.FirstName,
+            user.LastName,
             user.Email,
+            Role = user.Role.ToString(),
+            user.IsActive
         });
     }
 
-    public void UpdateUser(User user)
+    public void UpdateUser(UpdateUserDTO userDto)
     {
-        var updateUser = new User()
+        var updateUser = _userRepository.GetByUserId(userDto.Id);
+        Enum.TryParse(userDto.Role, out UserRole userRole);
+        if (updateUser != null)
         {
-            Id = user.Id,
-            Name = user.Name,
-            Email = user.Email,
-        };
-
-        _userRepository.UpdateUser(updateUser);
+            updateUser.FirstName = userDto.FirstName;
+            updateUser.LastName = userDto.LastName;
+            updateUser.Email = userDto.Email;
+            updateUser.Role = userRole;
+            updateUser.IsActive = userDto.IsAdmin;
+            _userRepository.UpdateUser(updateUser);
+        }
     }
+
     public User GetUserByEmailAndPassword(string email, string password)
     {
-        var user = _userRepository.GetAllUsers()
-            .FirstOrDefault(u => u.Email == email);
-
+        var user = _userRepository.GetAllUsers().FirstOrDefault(u => u.Email == email);
         if (user == null)
             return null;
-
-        if (user.Password == password)
+        var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
+        if (passwordVerificationResult == PasswordVerificationResult.Success)
             return user;
-
         return null;
     }
 }
