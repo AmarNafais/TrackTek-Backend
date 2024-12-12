@@ -13,6 +13,7 @@ namespace Data.Repositories
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<Customer> Customers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
