@@ -20,5 +20,13 @@ namespace Data.Entities.Enums
             InActive
         }
 
+        public enum OrderStatus
+        {
+            Pending,
+            InProgress,
+            Completed,
+            Cancelled
+        }
+
     }
 }

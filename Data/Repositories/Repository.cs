@@ -18,6 +18,10 @@ namespace Data.Repositories
         public DbSet<Machine> Machines { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<Garment> Garments { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<GarmentMaterial> GarmentMaterials { get; set; }
+        public DbSet<GarmentMachine> GarmentMachines { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
