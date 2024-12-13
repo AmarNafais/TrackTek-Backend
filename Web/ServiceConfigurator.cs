@@ -15,6 +15,7 @@ namespace Web
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<ISupplierService, SupplierService>();
             services.AddScoped<IMachineService, MachineService>();
+            services.AddScoped<IMaterialService, MaterialService>();
 
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
@@ -22,6 +23,7 @@ namespace Web
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
             services.AddScoped<IMachineRepository, MachineRepository>();
+            services.AddScoped<IMaterialRepository, MaterialRepository>();
 
             // Configure SmtpSettings
             services.Configure<SMTPSetting>(services.BuildServiceProvider().GetService<IConfiguration>().GetSection("SmtpSettings"));
