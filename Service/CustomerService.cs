@@ -38,12 +38,12 @@ namespace Service
                 IsActive = createCustomerDTO.IsActive
             };
 
-            return _customerRepository.AddCustomer(newCustomer);
+            return _customerRepository.Add(newCustomer);
         }
 
         public object GetCustomer(int id)
         {
-            var customer = _customerRepository.GetCustomerById(id);
+            var customer = _customerRepository.GetById(id);
             return new
             {
                 customer.Id,
@@ -57,7 +57,7 @@ namespace Service
 
         public object GetAllCustomers()
         {
-            var customers = _customerRepository.GetAllCustomers();
+            var customers = _customerRepository.GetAll();
             return customers.Select(customer => new
             {
                 customer.Id,
@@ -71,7 +71,7 @@ namespace Service
 
         public void UpdateCustomer(UpdateCustomerDTO updateCustomerDTO)
         {
-            var customerToBeUpdated = _customerRepository.GetCustomerById(updateCustomerDTO.Id);
+            var customerToBeUpdated = _customerRepository.GetById(updateCustomerDTO.Id);
             if (customerToBeUpdated != null)
             {
                 customerToBeUpdated.CustomerName = updateCustomerDTO.CustomerName;
@@ -79,17 +79,19 @@ namespace Service
                 customerToBeUpdated.ContactNumber = updateCustomerDTO.ContactNumber;
                 customerToBeUpdated.Address = updateCustomerDTO.Address;
                 customerToBeUpdated.IsActive = updateCustomerDTO.IsActive;
+
+                _customerRepository.Update(customerToBeUpdated);
             }
 
-            _customerRepository.UpdateCustomer(customerToBeUpdated);
+            
         }
 
         public void DeleteCustomer(int id)
         {
-            var customer = _customerRepository.GetCustomerById(id);
+            var customer = _customerRepository.GetById(id);
             if (customer != null)
             {
-                _customerRepository.DeleteCustomer(id);
+                _customerRepository.Delete(id);
             }
             
         }

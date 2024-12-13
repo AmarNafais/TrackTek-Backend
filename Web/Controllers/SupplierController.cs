@@ -17,7 +17,7 @@ public class SupplierController : Controller
         _supplierService = supplierService;
     }
 
-    [Route("v1/Supplier/CreateSupplier")]
+    [Route("v1/Supplier/Create")]
     [HttpPost]
     public IActionResult CreateSupplier(CreateSupplierDTO createSupplierDTO)
     {
@@ -32,7 +32,7 @@ public class SupplierController : Controller
         }
     }
 
-    [Route("v1/Supplier/GetSupplierById")]
+    [Route("v1/Supplier/GetById")]
     [HttpGet]
     public IActionResult GetSupplier(int id)
     {
@@ -47,7 +47,7 @@ public class SupplierController : Controller
         }
     }
 
-    [Route("v1/Supplier/GetAllSuppliers")]
+    [Route("v1/Supplier/GetAll")]
     [HttpGet]
     public IActionResult GetAllSuppliers()
     {
@@ -62,7 +62,7 @@ public class SupplierController : Controller
         }
     }
 
-    [Route("v1/Supplier/UpdateSupplier")]
+    [Route("v1/Supplier/Update")]
     [HttpPut]
     public IActionResult UpdateSupplier(UpdateSupplierDTO updateSupplierDTO)
     {
@@ -77,7 +77,7 @@ public class SupplierController : Controller
         }
     }
 
-    [Route("v1/Supplier/DeleteSupplier")]
+    [Route("v1/Supplier/Delete")]
     [HttpDelete]
     public IActionResult DeleteSupplier(int id)
     {

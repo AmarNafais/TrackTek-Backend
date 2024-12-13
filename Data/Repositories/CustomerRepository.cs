@@ -9,11 +9,11 @@ namespace Data.Repositories
 {
     public interface ICustomerRepository
     {
-        long AddCustomer(Customer customer);
-        Customer GetCustomerById(int id);
-        IEnumerable<Customer> GetAllCustomers();
-        void UpdateCustomer(Customer customer);
-        void DeleteCustomer(int id);
+        long Add(Customer customer);
+        Customer GetById(int id);
+        IEnumerable<Customer> GetAll();
+        void Update(Customer customer);
+        void Delete(int id);
     }
 
     public class CustomerRepository : ICustomerRepository
@@ -25,7 +25,7 @@ namespace Data.Repositories
             _repository = repository;
         }
 
-        public long AddCustomer(Customer customer)
+        public long Add(Customer customer)
         {
             var existingCustomer = _repository.Customers.Any(c => c.CustomerEmail == customer.CustomerEmail);
             if (existingCustomer)
@@ -38,17 +38,17 @@ namespace Data.Repositories
             return customer.Id;
         }
 
-        public Customer GetCustomerById(int id)
+        public Customer GetById(int id)
         {
             return _repository.Customers.FirstOrDefault(c => c.Id == id)
                 ?? throw new InvalidOperationException($"Customer with ID {id} not found.");
         }
-        public IEnumerable<Customer> GetAllCustomers()
+        public IEnumerable<Customer> GetAll()
         {
             return _repository.Customers;
         }
 
-        public void UpdateCustomer(Customer customer)
+        public void Update(Customer customer)
         {
             var customerToBeUpdated = _repository.Customers.FirstOrDefault(c => c.Id == customer.Id)
                 ?? throw new InvalidOperationException($"Customer with ID {customer.Id} not found");
@@ -61,7 +61,7 @@ namespace Data.Repositories
             _repository.SaveChanges();
         }
 
-        public void DeleteCustomer(int id)
+        public void Delete(int id)
         {
             var customerToDelete = _repository.Customers.FirstOrDefault(c => c.Id == id)
                 ?? throw new InvalidOperationException($"Customer with ID {id} not found.");

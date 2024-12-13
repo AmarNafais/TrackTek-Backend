@@ -17,7 +17,7 @@ public class CustomerController : Controller
         _customerService = customerService;
     }
 
-    [Route("v1/Customer/CreateCustomer")]
+    [Route("v1/Customer/Create")]
     [HttpPost]
     public IActionResult CreateUser(CreateCustomerDTO createCustomerDTO)
     {
@@ -32,7 +32,7 @@ public class CustomerController : Controller
         }
     }
 
-    [Route("v1/Customer/GetCustomerById")]
+    [Route("v1/Customer/GetById")]
     [HttpGet]
     public IActionResult GetCustomerById(int id)
     {
@@ -47,7 +47,7 @@ public class CustomerController : Controller
         }
     }
 
-    [Route("v1/Customer/GetAllCustomers")]
+    [Route("v1/Customer/GetAll")]
     [HttpGet]
     public IActionResult GetAllCustomers()
     {
@@ -62,7 +62,7 @@ public class CustomerController : Controller
         }
     }
 
-    [Route("v1/Customer/UpdateCustomer")]
+    [Route("v1/Customer/Update")]
     [HttpPut]
     public IActionResult UpdateCustomer(UpdateCustomerDTO updateCustomerDTO)
     {
@@ -77,7 +77,7 @@ public class CustomerController : Controller
         }
     }
 
-    [Route("v1/Customer/DeleteCustomer")]
+    [Route("v1/Customer/Delete")]
     [HttpDelete]
     public IActionResult DeleteCustomer(int id)
     {

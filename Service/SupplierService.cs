@@ -37,12 +37,12 @@ namespace Service
                 Address = createSupplierDTO.Address,
             };
 
-            return _supplierRepository.AddSupplier(newSupplier);
+            return _supplierRepository.Add(newSupplier);
         }
 
         public object GetSupplier(int id)
         {
-            var supplier = _supplierRepository.GetSupplierById(id);
+            var supplier = _supplierRepository.GetById(id);
             return new
             {
                 supplier.Name,
@@ -54,7 +54,7 @@ namespace Service
 
         public object GetAllSuppliers()
         {
-            var suppliers = _supplierRepository.GetAllSuppliers();
+            var suppliers = _supplierRepository.GetAll();
             return suppliers.Select(supplier => new
             {
                 supplier.Id,
@@ -67,7 +67,7 @@ namespace Service
 
         public void UpdateSupplier(UpdateSupplierDTO updateSupplierDTO)
         {
-            var supplierToBeUpdated = _supplierRepository.GetSupplierById(updateSupplierDTO.Id);
+            var supplierToBeUpdated = _supplierRepository.GetById(updateSupplierDTO.Id);
             if (supplierToBeUpdated != null)
             {
                 supplierToBeUpdated.Name = updateSupplierDTO.Name;
@@ -75,7 +75,7 @@ namespace Service
                 supplierToBeUpdated.Email = updateSupplierDTO.Email;
                 supplierToBeUpdated.Address = updateSupplierDTO.Address;
 
-                _supplierRepository.UpdateSupplier(supplierToBeUpdated);
+                _supplierRepository.Update(supplierToBeUpdated);
             }
 
             
@@ -83,10 +83,10 @@ namespace Service
 
         public void DeleteSupplier(int id)
         {
-            var supplier = _supplierRepository.GetSupplierById(id);
+            var supplier = _supplierRepository.GetById(id);
             if (supplier != null)
             {
-                _supplierRepository.DeleteSupplier(id);
+                _supplierRepository.Delete(id);
             }
 
         }

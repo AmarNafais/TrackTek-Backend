@@ -15,6 +15,8 @@ namespace Data.Repositories
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Machine> Machines { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -9,11 +9,11 @@ namespace Data.Repositories
 {
     public interface ISupplierRepository
     {
-        long AddSupplier(Supplier supplier);
-        Supplier GetSupplierById(int id);
-        IEnumerable<Supplier> GetAllSuppliers();
-        void UpdateSupplier(Supplier supplier);
-        void DeleteSupplier(int id);
+        long Add(Supplier supplier);
+        Supplier GetById(int id);
+        IEnumerable<Supplier> GetAll();
+        void Update(Supplier supplier);
+        void Delete(int id);
     }
 
     public class SupplierRepository : ISupplierRepository
@@ -25,7 +25,7 @@ namespace Data.Repositories
             _repository = repository;
         }
 
-        public long AddSupplier(Supplier supplier)
+        public long Add(Supplier supplier)
         {
             var existingSupplier = _repository.Suppliers.Any(s => s.Email == supplier.Email);
             if (existingSupplier)
@@ -38,18 +38,18 @@ namespace Data.Repositories
             return supplier.Id;
         }
 
-        public Supplier GetSupplierById(int id)
+        public Supplier GetById(int id)
         {
             return _repository.Suppliers.FirstOrDefault(s => s.Id == id)
                 ?? throw new InvalidOperationException($"Supplier with ID {id} not found.");
         }
 
-        public IEnumerable<Supplier> GetAllSuppliers()
+        public IEnumerable<Supplier> GetAll()
         {
             return _repository.Suppliers;
         }
 
-        public void UpdateSupplier(Supplier supplier)
+        public void Update(Supplier supplier)
         {
             var supplierToUpdate = _repository.Suppliers.FirstOrDefault(s => s.Id == supplier.Id)
                 ?? throw new InvalidOperationException($"Supplier with ID {supplier.Id} not found.");
@@ -61,7 +61,7 @@ namespace Data.Repositories
             _repository.SaveChanges();
         }
 
-        public void DeleteSupplier(int id)
+        public void Delete(int id)
         {
             var supplierToUpdate = _repository.Suppliers.FirstOrDefault(s => s.Id == id)
                 ?? throw new InvalidOperationException($"Supplier with ID {id} not found.");
