@@ -90,7 +90,7 @@ namespace Service
             var machine = _machineRepository.GetById(id);
             if (machine != null)
             {
-                _machineRepository.DeleteMachine(id);
+                _machineRepository.Delete(id);
             }
 
         }

@@ -8,6 +8,12 @@ namespace Data.Entities.Enums
 {
     public class Status
     {
+        public enum GarmentStatus
+        {
+            Available,
+            Discontinued
+        }
+
         public enum MachineStatus
         {
             Active,

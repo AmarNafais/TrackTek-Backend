@@ -8,7 +8,7 @@ namespace Data.Repositories
         Machine GetById(int id);
         IEnumerable<Machine> GetAll();
         void Update(Machine machine);
-        void DeleteMachine(int id);
+        void Delete(int id);
     }
 
     public class MachineRepository : IMachineRepository
@@ -57,7 +57,7 @@ namespace Data.Repositories
             _repository.SaveChanges();
         }
 
-        public void DeleteMachine(int id)
+        public void Delete(int id)
         {
             var machineToUpdate = _repository.Machines.FirstOrDefault(m => m.Id == id)
                 ?? throw new InvalidOperationException($"Machine with ID {id} not found.");
