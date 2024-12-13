@@ -23,6 +23,9 @@ namespace Data.Migrations
                     TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OrderStatus = table.Column<string>(type: "nvarchar(50)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
+                    GarmentId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Size = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedById = table.Column<int>(type: "int", nullable: true)
@@ -37,6 +40,12 @@ namespace Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Orders_Garments_GarmentId",
+                        column: x => x.GarmentId,
+                        principalTable: "Garments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Orders_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
@@ -48,6 +57,11 @@ namespace Data.Migrations
                 name: "IX_Orders_CustomerId",
                 table: "Orders",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_GarmentId",
+                table: "Orders",
+                column: "GarmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",

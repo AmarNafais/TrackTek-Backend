@@ -300,12 +300,22 @@ namespace Data.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("GarmentId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("OrderDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("OrderStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalCost")
                         .HasColumnType("decimal(18,2)");
@@ -323,48 +333,11 @@ namespace Data.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("GarmentId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Data.Entities.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("GarmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Size")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GarmentId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("Data.Entities.PasswordResetToken", b =>
@@ -520,6 +493,12 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Data.Entities.Garment", "Garment")
+                        .WithMany()
+                        .HasForeignKey("GarmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Data.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -529,25 +508,8 @@ namespace Data.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("Data.Entities.OrderItem", b =>
-                {
-                    b.HasOne("Data.Entities.Garment", "Garment")
-                        .WithMany()
-                        .HasForeignKey("GarmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Garment");
-
-                    b.Navigation("Order");
                 });
 #pragma warning restore 612, 618
         }

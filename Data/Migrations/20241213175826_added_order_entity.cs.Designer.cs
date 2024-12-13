@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(Repository))]
-    [Migration("20241213130826_added_order_entity.cs")]
+    [Migration("20241213175826_added_order_entity.cs")]
     partial class added_order_entitycs
     {
         /// <inheritdoc />
@@ -139,6 +139,80 @@ namespace Data.Migrations
                     b.ToTable("Garments");
                 });
 
+            modelBuilder.Entity("Data.Entities.GarmentMachine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GarmentId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("HoursRequired")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MachineId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GarmentId");
+
+                    b.HasIndex("MachineId");
+
+                    b.ToTable("GarmentMachines");
+                });
+
+            modelBuilder.Entity("Data.Entities.GarmentMaterial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GarmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RequiredQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UnitOfMeasurement")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GarmentId");
+
+                    b.HasIndex("MaterialId");
+
+                    b.ToTable("GarmentMaterials");
+                });
+
             modelBuilder.Entity("Data.Entities.Machine", b =>
                 {
                     b.Property<int>("Id")
@@ -229,12 +303,22 @@ namespace Data.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("GarmentId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("OrderDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("OrderStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalCost")
                         .HasColumnType("decimal(18,2)");
@@ -251,6 +335,8 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("GarmentId");
 
                     b.HasIndex("UserId");
 
@@ -364,11 +450,55 @@ namespace Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Data.Entities.GarmentMachine", b =>
+                {
+                    b.HasOne("Data.Entities.Garment", "Garment")
+                        .WithMany()
+                        .HasForeignKey("GarmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.Machine", "Machine")
+                        .WithMany()
+                        .HasForeignKey("MachineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Garment");
+
+                    b.Navigation("Machine");
+                });
+
+            modelBuilder.Entity("Data.Entities.GarmentMaterial", b =>
+                {
+                    b.HasOne("Data.Entities.Garment", "Garment")
+                        .WithMany()
+                        .HasForeignKey("GarmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Garment");
+
+                    b.Navigation("Material");
+                });
+
             modelBuilder.Entity("Data.Entities.Order", b =>
                 {
                     b.HasOne("Data.Entities.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.Garment", "Garment")
+                        .WithMany()
+                        .HasForeignKey("GarmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -381,6 +511,8 @@ namespace Data.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Customer");
+
+                    b.Navigation("Garment");
                 });
 #pragma warning restore 612, 618
         }

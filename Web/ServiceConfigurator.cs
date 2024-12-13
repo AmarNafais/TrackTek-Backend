@@ -19,7 +19,7 @@ namespace Web
             services.AddScoped<IGarmentService, GarmentService>();
             services.AddScoped<IGarmentMaterialService, GarmentMaterialService>();
             services.AddScoped<IGarmentMachineService, GarmentMachineService>();
-            services.AddScoped<IOrderItemService, OrderItemService>();
+            services.AddScoped<IOrderService, OrderService>();
 
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
@@ -31,7 +31,7 @@ namespace Web
             services.AddScoped<IGarmentRepository, GarmentRepository>();
             services.AddScoped<IGarmentMaterialRepository, GarmentMaterialRepository>();
             services.AddScoped<IGarmentMachineRepository, GarmentMachineRepository>();
-            services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
 
             // Configure SmtpSettings
             services.Configure<SMTPSetting>(services.BuildServiceProvider().GetService<IConfiguration>().GetSection("SmtpSettings"));
