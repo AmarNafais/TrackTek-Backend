@@ -25,6 +25,7 @@ namespace Service
         private readonly IGarmentRepository _garmentRepository;
         private readonly IGarmentMaterialRepository _garmentMaterialRepository;
         private readonly IGarmentMachineRepository _garmentMachineRepository;
+        private readonly ICostService _costService;
 
         public OrderService(
             IOrderRepository orderRepository,
@@ -32,7 +33,8 @@ namespace Service
             IMaterialRepository materialRepository,
             IGarmentRepository garmentRepository,
             IGarmentMaterialRepository garmentMaterialRepository,
-            IGarmentMachineRepository garmentMachineRepository)
+            IGarmentMachineRepository garmentMachineRepository,
+            ICostService costService)
         {
             _orderRepository = orderRepository;
             _machineRepository = machineRepository;
@@ -40,6 +42,7 @@ namespace Service
             _garmentRepository = garmentRepository;
             _garmentMaterialRepository = garmentMaterialRepository;
             _garmentMachineRepository = garmentMachineRepository;
+            _costService = costService;
         }
 
         public object AddOrder(CreateOrderDTO dTO)
@@ -87,13 +90,16 @@ namespace Service
                 ? Status.OrderStatus.InProgress
                 : Status.OrderStatus.Pending;
 
+            // calculate the total cost
+            var totalCost = _costService.CalculateTotalCost(dTO.GarmentId, dTO.Quantity);
+
             // Create and add the order
             var newOrder = new Order
             {
                 CustomerId = dTO.CustomerId,
                 OrderDate = dTO.OrderDate,
                 DueDate = dTO.DueDate,
-                TotalCost = dTO.TotalCost,
+                TotalCost = totalCost,
                 OrderStatus = orderStatus,
                 UserId = 1,
                 GarmentId = dTO.GarmentId,
@@ -172,15 +178,55 @@ namespace Service
 
         public void UpdateOrder(UpdateOrderDTO dTO)
         {
-            Enum.TryParse(dTO.OrderStatus, out Status.OrderStatus orderStatus);
-
+            // Retrieve the order to update
             var orderToUpdate = _orderRepository.GetById(dTO.Id);
+
+            if (orderToUpdate == null)
+            {
+                throw new InvalidOperationException("Order not found.");
+            }
+
+            // Check if the current order status is InProgress
+            if (orderToUpdate.OrderStatus == Status.OrderStatus.InProgress)
+            {
+                // Restore materials
+                var garmentMaterials = _garmentMaterialRepository.GetAll()
+                    .Where(gm => gm.GarmentId == orderToUpdate.GarmentId)
+                    .ToList();
+
+                foreach (var garmentMaterial in garmentMaterials)
+                {
+                    var material = _materialRepository.GetById(garmentMaterial.MaterialId);
+                    material.QuantityInStock += (int)(garmentMaterial.RequiredQuantity * orderToUpdate.Quantity);
+                    _materialRepository.Update(material);
+                }
+
+                // Reset machine status
+                var garmentMachines = _garmentMachineRepository.GetAll()
+                    .Where(gm => gm.GarmentId == orderToUpdate.GarmentId)
+                    .ToList();
+
+                foreach (var garmentMachine in garmentMachines)
+                {
+                    var machine = _machineRepository.GetById(garmentMachine.MachineId);
+                    if (machine.MachineStatus == Status.MachineStatus.Active)
+                    {
+                        machine.MachineStatus = Status.MachineStatus.InActive;
+                        _machineRepository.Update(machine);
+                    }
+                }
+            }
+            Enum.TryParse(dTO.OrderStatus, out Status.OrderStatus orderStatus);
+            
+            // calculate the total cost
+            var totalCost = _costService.CalculateTotalCost(dTO.GarmentId, dTO.Quantity);
+
             if (orderToUpdate != null)
             {
                 orderToUpdate.CustomerId = dTO.CustomerId;
                 orderToUpdate.OrderDate = dTO.OrderDate;
                 orderToUpdate.DueDate = dTO.DueDate;
-                orderToUpdate.TotalCost = dTO.TotalCost;
+                orderToUpdate.TotalCost = totalCost;
                 orderToUpdate.OrderStatus = orderStatus;
                 orderToUpdate.GarmentId = dTO.GarmentId;
                 orderToUpdate.Quantity = dTO.Quantity;
@@ -193,10 +239,44 @@ namespace Service
         public void DeleteOrder(int id)
         {
             var order = _orderRepository.GetById(id);
-            if (order != null)
+
+            if (order == null)
             {
-                _orderRepository.Delete(id);
+                throw new InvalidOperationException("Order not found.");
             }
+
+            // Check if the current order status is InProgress
+            if (order.OrderStatus == Status.OrderStatus.InProgress)
+            {
+                // Restore materials
+                var garmentMaterials = _garmentMaterialRepository.GetAll()
+                    .Where(gm => gm.GarmentId == order.GarmentId)
+                    .ToList();
+
+                foreach (var garmentMaterial in garmentMaterials)
+                {
+                    var material = _materialRepository.GetById(garmentMaterial.MaterialId);
+                    material.QuantityInStock += (int)(garmentMaterial.RequiredQuantity * order.Quantity);
+                    _materialRepository.Update(material);
+                }
+
+                // Reset machine status
+                var garmentMachines = _garmentMachineRepository.GetAll()
+                    .Where(gm => gm.GarmentId == order.GarmentId)
+                    .ToList();
+
+                foreach (var garmentMachine in garmentMachines)
+                {
+                    var machine = _machineRepository.GetById(garmentMachine.MachineId);
+                    if (machine.MachineStatus == Status.MachineStatus.Active)
+                    {
+                        machine.MachineStatus = Status.MachineStatus.InActive;
+                        _machineRepository.Update(machine);
+                    }
+                }
+            }
+
+            _orderRepository.Delete(id);
         }
     }
 }

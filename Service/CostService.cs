@@ -12,12 +12,14 @@ namespace Service
     public interface ICostService
     {
         object CalculateCost(CreateCostDTO dTO);
+        decimal CalculateTotalCost(int garmentId, int quantity);
         void AddCost(Cost cost);
         void UpdateCost(Cost cost);
         void DeleteCost(int id);
         Cost GetCostById(int id); 
         Cost GetCostByOrderId(int orderId); 
         IEnumerable<Cost> GetAllCosts();
+
     }
 
     public class CostService : ICostService
@@ -103,6 +105,34 @@ namespace Service
                 TotalCost = totalCost
             };
         }
+
+        // for totalcost variable in order entity
+        public decimal CalculateTotalCost(int garmentId, int quantity)
+        {
+            // Fetch Garment Materials
+            var garmentMaterials = _garmentMaterialRepository.GetByGarmentId(garmentId).ToList();
+
+            // Calculate Material Costs
+            var materialCost = garmentMaterials.Sum(garmentMaterial =>
+            {
+                var material = _materialRepository.GetById(garmentMaterial.MaterialId);
+                return material.UnitCost * garmentMaterial.RequiredQuantity * quantity;
+            });
+
+            // Fetch Garment Machines
+            var garmentMachines = _garmentMachineRepository.GetByGarmentId(garmentId).ToList();
+
+            // Calculate Machine Costs
+            var machineCost = garmentMachines.Sum(garmentMachine =>
+            {
+                var machine = _machineRepository.GetById(garmentMachine.MachineId);
+                return machine.HourlyRate * garmentMachine.HoursRequired;
+            });
+
+            // Total Cost
+            return materialCost + machineCost;
+        }
+
 
         public void AddCost(Cost cost)
         {
