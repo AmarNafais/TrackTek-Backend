@@ -23,7 +23,7 @@ namespace Web.Controllers
             try
             {
                 var orderId = _orderService.AddOrder(dTO);
-                return Ok($"Order created successfully with ID {orderId}");
+                return Ok(orderId);
             }
             catch (Exception ex)
             {

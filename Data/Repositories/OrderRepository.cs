@@ -48,7 +48,6 @@ namespace Data.Repositories
             orderToUpdate.DueDate = order.DueDate;
             orderToUpdate.TotalCost = order.TotalCost;
             orderToUpdate.OrderStatus = order.OrderStatus;
-            orderToUpdate.UserId = order.UserId;
             orderToUpdate.GarmentId = order.GarmentId;
             orderToUpdate.Quantity = order.Quantity;
             orderToUpdate.Size = order.Size;

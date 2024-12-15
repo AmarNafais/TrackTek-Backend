@@ -1,6 +1,7 @@
 ﻿using Data.Entities;
 using Data.Entities.Enums;
 using Data.Repositories;
+using Microsoft.Extensions.Logging;
 using Service.DTOs;
 using System;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Service
 {
     public interface IOrderService
     {
-        long AddOrder(CreateOrderDTO dTO);
+        object AddOrder(CreateOrderDTO dTO);
         object GetOrder(int id);
         object GetAllOrders();
         void UpdateOrder(UpdateOrderDTO dTO);
@@ -19,11 +20,11 @@ namespace Service
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly IMachineRepository _machineRepository;  
-        private readonly IMaterialRepository _materialRepository;  
-        private readonly IGarmentRepository _garmentRepository;  
-        private readonly IGarmentMaterialRepository _garmentMaterialRepository; 
-        private readonly IGarmentMachineRepository _garmentMachineRepository;  
+        private readonly IMachineRepository _machineRepository;
+        private readonly IMaterialRepository _materialRepository;
+        private readonly IGarmentRepository _garmentRepository;
+        private readonly IGarmentMaterialRepository _garmentMaterialRepository;
+        private readonly IGarmentMachineRepository _garmentMachineRepository;
 
         public OrderService(
             IOrderRepository orderRepository,
@@ -41,7 +42,7 @@ namespace Service
             _garmentMachineRepository = garmentMachineRepository;
         }
 
-        public long AddOrder(CreateOrderDTO dTO)
+        public object AddOrder(CreateOrderDTO dTO)
         {
             // Validate Garment
             var garment = _garmentRepository.GetById(dTO.GarmentId);
@@ -49,33 +50,44 @@ namespace Service
                 throw new InvalidOperationException("Garment not found.");
 
             // Check Material Availability
-            bool materialsAvailable = true;
-            var garmentMaterials = _garmentMaterialRepository.GetAll().Where(gm => gm.GarmentId == dTO.GarmentId);
+            var warnings = new List<string>();
+            var materialsAvailable = true;
+            var garmentMaterials = _garmentMaterialRepository.GetAll()
+                .Where(gm => gm.GarmentId == dTO.GarmentId)
+                .ToList();
+
             foreach (var garmentMaterial in garmentMaterials)
             {
                 var material = _materialRepository.GetById(garmentMaterial.MaterialId);
                 if (material.QuantityInStock < garmentMaterial.RequiredQuantity * dTO.Quantity)
                 {
                     materialsAvailable = false;
-                    break; // No need to check further materials if one is already unavailable
+                    warnings.Add($"Insufficient material: {material.Name}");
                 }
             }
 
             // Check Machine Availability
-            bool machinesAvailable = true;
-            var garmentMachines = _garmentMachineRepository.GetAll().Where(gm => gm.GarmentId == dTO.GarmentId);
+            var machinesAvailable = true;
+            var garmentMachines = _garmentMachineRepository.GetAll()
+                .Where(gm => gm.GarmentId == dTO.GarmentId)
+                .ToList();
+
             foreach (var garmentMachine in garmentMachines)
             {
                 var machine = _machineRepository.GetById(garmentMachine.MachineId);
-                if (machine.MachineStatus == Status.MachineStatus.Active)
+                if (machine.MachineStatus != Status.MachineStatus.InActive)
                 {
                     machinesAvailable = false;
-                    break;
+                    warnings.Add($"Machine {machine.Name} is unavailable.");
                 }
             }
 
-            var orderStatus = (materialsAvailable && machinesAvailable) ? Status.OrderStatus.InProgress : Status.OrderStatus.Pending;
+            // Set the order status
+            var orderStatus = (materialsAvailable && machinesAvailable)
+                ? Status.OrderStatus.InProgress
+                : Status.OrderStatus.Pending;
 
+            // Create and add the order
             var newOrder = new Order
             {
                 CustomerId = dTO.CustomerId,
@@ -83,14 +95,46 @@ namespace Service
                 DueDate = dTO.DueDate,
                 TotalCost = dTO.TotalCost,
                 OrderStatus = orderStatus,
-                UserId = dTO.UserId,
+                UserId = 1,
                 GarmentId = dTO.GarmentId,
                 Quantity = dTO.Quantity,
-                Size = dTO.Size,
+                Size = dTO.Size
             };
 
-            return _orderRepository.Add(newOrder);
+            var orderId = _orderRepository.Add(newOrder);
+
+            // Update Stock and Machine Status if the order is InProgress
+            if (orderStatus == Status.OrderStatus.InProgress)
+            {
+                // Update Material Stock
+                foreach (var garmentMaterial in garmentMaterials)
+                {
+                    var material = _materialRepository.GetById(garmentMaterial.MaterialId);
+                    material.QuantityInStock -= (int)(garmentMaterial.RequiredQuantity * dTO.Quantity);
+                    _materialRepository.Update(material);
+                }
+
+                // Update Machine Status
+                foreach (var garmentMachine in garmentMachines)
+                {
+                    var machine = _machineRepository.GetById(garmentMachine.MachineId);
+                    if (machine.MachineStatus == Status.MachineStatus.InActive)
+                    {
+                        machine.MachineStatus = Status.MachineStatus.Active;
+                        _machineRepository.Update(machine);
+                    }
+                }
+            }
+
+            return new
+            {
+                Message = "Order created successfully.",
+                OrderId = orderId,
+                OrderStatus = orderStatus,
+                Warnings = warnings
+            };
         }
+
 
         public object GetOrder(int id)
         {
@@ -138,7 +182,6 @@ namespace Service
                 orderToUpdate.DueDate = dTO.DueDate;
                 orderToUpdate.TotalCost = dTO.TotalCost;
                 orderToUpdate.OrderStatus = orderStatus;
-                orderToUpdate.UserId = dTO.UserId;
                 orderToUpdate.GarmentId = dTO.GarmentId;
                 orderToUpdate.Quantity = dTO.Quantity;
                 orderToUpdate.Size = dTO.Size;

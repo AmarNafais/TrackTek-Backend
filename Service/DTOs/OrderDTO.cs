@@ -13,11 +13,6 @@ namespace Service.DTOs
         public DateTime OrderDate { get; set; }
         public DateTime DueDate { get; set; }
         public decimal TotalCost { get; set; }
-
-        [DefaultValue("Pending | InProgress | Completed | Canceled")]
-        public string OrderStatus { get; set; }
-
-        public int UserId { get; set; }
         public int GarmentId { get; set; }
         public int Quantity { get; set; }
         public string Size { get; set; }
@@ -25,5 +20,8 @@ namespace Service.DTOs
     public class UpdateOrderDTO : CreateOrderDTO
     {
         public int Id { get; set; }
+
+        [DefaultValue("Pending | InProgress | Completed | Canceled")]
+        public string OrderStatus { get; set; }
     }
 }
