@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Repositories
 {
@@ -12,6 +10,7 @@ namespace Data.Repositories
         long Add(GarmentMaterial garmentMaterial);
         GarmentMaterial GetById(int id);
         IEnumerable<GarmentMaterial> GetAll();
+        IEnumerable<GarmentMaterial> GetByGarmentId(int garmentId); // New method
         void Update(GarmentMaterial garmentMaterial);
         void Delete(int id);
     }
@@ -37,9 +36,15 @@ namespace Data.Repositories
             return _repository.GarmentMaterials.FirstOrDefault(g => g.Id == id)
                 ?? throw new InvalidOperationException($"GarmentMaterial with ID {id} not found.");
         }
+
         public IEnumerable<GarmentMaterial> GetAll()
         {
             return _repository.GarmentMaterials;
+        }
+
+        public IEnumerable<GarmentMaterial> GetByGarmentId(int garmentId) // New method implementation
+        {
+            return _repository.GarmentMaterials.Where(g => g.GarmentId == garmentId).ToList();
         }
 
         public void Update(GarmentMaterial garmentMaterial)
@@ -57,11 +62,10 @@ namespace Data.Repositories
 
         public void Delete(int id)
         {
-            var garmentMaterialToDelete = _repository.Customers.FirstOrDefault(g => g.Id == id)
+            var garmentMaterialToDelete = _repository.GarmentMaterials.FirstOrDefault(g => g.Id == id) // Fixed reference
                 ?? throw new InvalidOperationException($"GarmentMaterial with ID {id} not found.");
-            _repository.Customers.Remove(garmentMaterialToDelete);
+            _repository.GarmentMaterials.Remove(garmentMaterialToDelete); // Fixed reference
             _repository.SaveChanges();
         }
-
     }
 }

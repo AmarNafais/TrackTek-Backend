@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Repositories
 {
@@ -12,6 +10,7 @@ namespace Data.Repositories
         long Add(GarmentMachine garmentMachine);
         GarmentMachine GetById(int id);
         IEnumerable<GarmentMachine> GetAll();
+        IEnumerable<GarmentMachine> GetByGarmentId(int garmentId); // New method
         void Update(GarmentMachine garmentMachine);
         void Delete(int id);
     }
@@ -37,9 +36,15 @@ namespace Data.Repositories
             return _repository.GarmentMachines.FirstOrDefault(g => g.Id == id)
                 ?? throw new InvalidOperationException($"GarmentMachine with ID {id} not found.");
         }
+
         public IEnumerable<GarmentMachine> GetAll()
         {
             return _repository.GarmentMachines;
+        }
+
+        public IEnumerable<GarmentMachine> GetByGarmentId(int garmentId) // New method implementation
+        {
+            return _repository.GarmentMachines.Where(g => g.GarmentId == garmentId).ToList();
         }
 
         public void Update(GarmentMachine garmentMachine)
@@ -57,10 +62,9 @@ namespace Data.Repositories
         public void Delete(int id)
         {
             var garmentMachineToDelete = _repository.GarmentMachines.FirstOrDefault(g => g.Id == id)
-                ?? throw new InvalidOperationException($"GarmentMaterial with ID {id} not found.");
+                ?? throw new InvalidOperationException($"GarmentMachine with ID {id} not found."); // Fixed message
             _repository.GarmentMachines.Remove(garmentMachineToDelete);
             _repository.SaveChanges();
         }
-
     }
 }
