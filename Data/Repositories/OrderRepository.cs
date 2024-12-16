@@ -4,7 +4,7 @@ namespace Data.Repositories
 {
     public interface IOrderRepository
     {
-        long Add(Order order);
+        int Add(Order order);
         Order GetById(int id);
         IEnumerable<Order> GetAll();
         void Update(Order order);
@@ -20,7 +20,7 @@ namespace Data.Repositories
             _repository = repository;
         }
 
-        public long Add(Order order)
+        public int Add(Order order)
         {
             _repository.Orders.Add(order);
             _repository.SaveChanges();

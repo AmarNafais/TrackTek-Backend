@@ -108,6 +108,7 @@ namespace Service
             };
 
             var orderId = _orderRepository.Add(newOrder);
+            _costService.CalculateCost(orderId);
 
             // Update Stock and Machine Status if the order is InProgress
             if (orderStatus == Status.OrderStatus.InProgress)

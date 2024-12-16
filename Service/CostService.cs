@@ -11,7 +11,7 @@ namespace Service
 {
     public interface ICostService
     {
-        object CalculateCost(CreateCostDTO dTO);
+        object CalculateCost(int orderId);
         decimal CalculateTotalCost(int garmentId, int quantity);
         void AddCost(Cost cost);
         void UpdateCost(Cost cost);
@@ -47,10 +47,10 @@ namespace Service
             _costRepository = costRepository;
         }
 
-        public object CalculateCost(CreateCostDTO dTO)
+        public object CalculateCost(int orderId)
         {
             // Fetch GarmentId using OrderId
-            var order = _orderRepository.GetById(dTO.OrderId);
+            var order = _orderRepository.GetById(orderId);
             if (order == null)
             {
                 throw new InvalidOperationException("Order not found.");
@@ -90,7 +90,7 @@ namespace Service
 
             var cost = new Cost
             {
-                OrderId = dTO.OrderId,  // Linking to the Order
+                OrderId = orderId,  // Linking to the Order
                 MaterialCost = materialCost,
                 MachineCost = machineCost,
                 TotalCost = totalCost
