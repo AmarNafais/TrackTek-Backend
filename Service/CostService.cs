@@ -30,6 +30,7 @@ namespace Service
         private readonly IMachineRepository _machineRepository;
         private readonly IGarmentMachineRepository _garmentMachineRepository;
         private readonly ICostRepository _costRepository;
+        private readonly IGarmentRepository _garmentRepository;
 
         public CostService(
             IOrderRepository orderRepository,
@@ -37,7 +38,8 @@ namespace Service
             IGarmentMaterialRepository garmentMaterialRepository,
             IMachineRepository machineRepository,
             IGarmentMachineRepository garmentMachineRepository,
-            ICostRepository costRepository)
+            ICostRepository costRepository,
+            IGarmentRepository garmentRepository)
         {
             _orderRepository = orderRepository;
             _materialRepository = materialRepository;
@@ -45,6 +47,7 @@ namespace Service
             _machineRepository = machineRepository;
             _garmentMachineRepository = garmentMachineRepository;
             _costRepository = costRepository;
+            _garmentRepository = garmentRepository;
         }
 
         public object CalculateCost(int orderId)
@@ -85,13 +88,24 @@ namespace Service
                 return machine.HourlyRate * garmentMachine.HoursRequired;
             });
 
+            // Fetch Garment for Labor Cost Calculation
+            var garment = _garmentRepository.GetById(garmentId);
+            if (garment == null)
+            {
+                throw new InvalidOperationException("Garment not found.");
+            }
+            Console.WriteLine($"Garment Found: {garment.Name}, Labor Hours per Unit: {garment.LaborHoursPerUnit}, Hourly Rate: {garment.HourlyLaborRate}, Quantity: {order.Quantity}");
+            // Calculate Labor Costs
+            var laborCost = garment.LaborHoursPerUnit * garment.HourlyLaborRate * order.Quantity;
+
             // Total Cost
-            var totalCost = materialCost + machineCost;
+            var totalCost = materialCost + machineCost + laborCost;
 
             var cost = new Cost
             {
                 OrderId = orderId,  // Linking to the Order
                 MaterialCost = materialCost,
+                LaborCost = laborCost,
                 MachineCost = machineCost,
                 TotalCost = totalCost
             };
@@ -101,6 +115,7 @@ namespace Service
             return new
             {
                 MaterialCost = materialCost,
+                LaborCost = laborCost,
                 MachineCost = machineCost,
                 TotalCost = totalCost
             };
@@ -129,8 +144,18 @@ namespace Service
                 return machine.HourlyRate * garmentMachine.HoursRequired;
             });
 
+            // Fetch Garment for Labor Costs
+            var garment = _garmentRepository.GetById(garmentId);
+            if (garment == null)
+            {
+                throw new InvalidOperationException("Garment not found.");
+            }
+
+            // Calculate Labor Costs
+            var laborCost = garment.LaborHoursPerUnit * garment.HourlyLaborRate * quantity;
+
             // Total Cost
-            return materialCost + machineCost;
+            return materialCost + machineCost + laborCost;
         }
 
 
