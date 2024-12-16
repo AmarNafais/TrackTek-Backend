@@ -61,7 +61,7 @@ public class UserService : IUserService
             updateUser.LastName = userDto.LastName;
             updateUser.Email = userDto.Email;
             updateUser.Role = userRole;
-            updateUser.IsActive = userDto.IsAdmin;
+            updateUser.IsActive = userDto.IsActive;
             _userRepository.UpdateUser(updateUser);
         }
     }

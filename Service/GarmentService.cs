@@ -114,7 +114,6 @@ namespace Service
             _garmentRepository.Update(garmentToBeUpdated);
         }
 
-        // Update the status of a garment
         public void UpdateGarmentStatus(UpdateGarmentStatusDTO dTO)
         {
             Enum.TryParse(dTO.GarmentStatus, out Status.GarmentStatus garmentStatus);
@@ -129,7 +128,6 @@ namespace Service
             _garmentRepository.Update(garmentToBeUpdated);
         }
 
-        // Update the category of a garment
         public void UpdateCategory(UpdateCategoryDTO dTO)
         {
             Enum.TryParse(dTO.CategoryType, out Category category);

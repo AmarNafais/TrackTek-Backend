@@ -76,6 +76,21 @@ namespace Web.Controllers
             }
         }
 
+        [Route("v1/Order/UpdateOrderStatus")]
+        [HttpPut]
+        public IActionResult UpdateOrderStatus(UpdateOrderStatusDTO dTO)
+        {
+            try
+            {
+                _orderService.UpdateOrderStatus(dTO);
+                return Ok("Updated Order Status Successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [Route("v1/Order/Delete")]
         [HttpDelete]
         public IActionResult DeleteOrder(int id)

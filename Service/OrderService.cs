@@ -14,6 +14,7 @@ namespace Service
         object GetOrder(int id);
         object GetAllOrders();
         void UpdateOrder(UpdateOrderDTO dTO);
+        void UpdateOrderStatus(UpdateOrderStatusDTO dTO);
         void DeleteOrder(int id);
     }
 
@@ -191,32 +192,50 @@ namespace Service
 
         public void UpdateOrder(UpdateOrderDTO dTO)
         {
-            // Retrieve the order to update
             var orderToUpdate = _orderRepository.GetById(dTO.Id);
 
-            if (orderToUpdate == null)
+            // calculate the total cost
+            var totalCost = _costService.CalculateTotalCost(dTO.GarmentId, dTO.Quantity);
+
+            if (orderToUpdate != null)
+            {
+                orderToUpdate.CustomerId = dTO.CustomerId;
+                orderToUpdate.OrderDate = dTO.OrderDate;
+                orderToUpdate.DueDate = dTO.DueDate;
+                orderToUpdate.TotalCost = totalCost;
+                orderToUpdate.GarmentId = dTO.GarmentId;
+                orderToUpdate.Quantity = dTO.Quantity;
+                orderToUpdate.Size = dTO.Size;
+
+                _orderRepository.Update(orderToUpdate);
+            }
+        }
+        public void UpdateOrderStatus(UpdateOrderStatusDTO dTO)
+        {
+            var orderToBeUpdated = _orderRepository.GetById(dTO.Id);
+
+            if (orderToBeUpdated == null)
             {
                 throw new InvalidOperationException("Order not found.");
             }
 
-            // Check if the current order status is InProgress
-            if (orderToUpdate.OrderStatus == Status.OrderStatus.InProgress)
+            if (orderToBeUpdated.OrderStatus == Status.OrderStatus.InProgress)
             {
                 // Restore materials
                 var garmentMaterials = _garmentMaterialRepository.GetAll()
-                    .Where(gm => gm.GarmentId == orderToUpdate.GarmentId)
+                    .Where(gm => gm.GarmentId == orderToBeUpdated.GarmentId)
                     .ToList();
 
                 foreach (var garmentMaterial in garmentMaterials)
                 {
                     var material = _materialRepository.GetById(garmentMaterial.MaterialId);
-                    material.QuantityInStock += (int)(garmentMaterial.RequiredQuantity * orderToUpdate.Quantity);
+                    material.QuantityInStock += (int)(garmentMaterial.RequiredQuantity * orderToBeUpdated.Quantity);
                     _materialRepository.Update(material);
                 }
 
                 // Reset machine status
                 var garmentMachines = _garmentMachineRepository.GetAll()
-                    .Where(gm => gm.GarmentId == orderToUpdate.GarmentId)
+                    .Where(gm => gm.GarmentId == orderToBeUpdated.GarmentId)
                     .ToList();
 
                 foreach (var garmentMachine in garmentMachines)
@@ -230,23 +249,10 @@ namespace Service
                 }
             }
             Enum.TryParse(dTO.OrderStatus, out Status.OrderStatus orderStatus);
-            
-            // calculate the total cost
-            var totalCost = _costService.CalculateTotalCost(dTO.GarmentId, dTO.Quantity);
 
-            if (orderToUpdate != null)
-            {
-                orderToUpdate.CustomerId = dTO.CustomerId;
-                orderToUpdate.OrderDate = dTO.OrderDate;
-                orderToUpdate.DueDate = dTO.DueDate;
-                orderToUpdate.TotalCost = totalCost;
-                orderToUpdate.OrderStatus = orderStatus;
-                orderToUpdate.GarmentId = dTO.GarmentId;
-                orderToUpdate.Quantity = dTO.Quantity;
-                orderToUpdate.Size = dTO.Size;
 
-                _orderRepository.Update(orderToUpdate);
-            }
+            orderToBeUpdated.OrderStatus = orderStatus;
+            _orderRepository.Update(orderToBeUpdated);
         }
 
         public void DeleteOrder(int id)

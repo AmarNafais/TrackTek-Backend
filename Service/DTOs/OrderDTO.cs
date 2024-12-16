@@ -19,6 +19,10 @@ namespace Service.DTOs
     public class UpdateOrderDTO : CreateOrderDTO
     {
         public int Id { get; set; }
+    }
+    public class UpdateOrderStatusDTO
+    {
+        public int Id { get; set; }
 
         [DefaultValue("Pending | InProgress | Completed | Canceled")]
         public string OrderStatus { get; set; }
