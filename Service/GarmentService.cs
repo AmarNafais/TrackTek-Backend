@@ -5,8 +5,6 @@ using Service.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service
 {
@@ -16,6 +14,8 @@ namespace Service
         object GetGarment(int id);
         object GetAllGarments();
         void UpdateGarment(UpdateGarmentDTO dTO);
+        void UpdateGarmentStatus(UpdateGarmentStatusDTO dTO);
+        void UpdateCategory(UpdateCategoryDTO dTO);
         void DeleteGarment(int id);
     }
 
@@ -28,11 +28,12 @@ namespace Service
             _garmentRepository = garmentRepository;
         }
 
+        // Add a new garment
         public long AddGarment(CreateGarmentDTO dTO)
         {
             Enum.TryParse(dTO.CategoryType, out Category category);
             Enum.TryParse(dTO.GarmentStatus, out Status.GarmentStatus garmentStatus);
-            
+
             var newGarment = new Garment
             {
                 Name = dTO.Name,
@@ -48,9 +49,15 @@ namespace Service
             return _garmentRepository.Add(newGarment);
         }
 
+        // Retrieve a single garment by ID
         public object GetGarment(int id)
         {
             var garment = _garmentRepository.GetById(id);
+            if (garment == null)
+            {
+                throw new InvalidOperationException("Garment not found.");
+            }
+
             return new
             {
                 garment.Id,
@@ -65,6 +72,7 @@ namespace Service
             };
         }
 
+        // Retrieve all garments
         public object GetAllGarments()
         {
             var garments = _garmentRepository.GetAll();
@@ -82,37 +90,70 @@ namespace Service
             });
         }
 
+        // Update an entire garment
         public void UpdateGarment(UpdateGarmentDTO dTO)
         {
             Enum.TryParse(dTO.CategoryType, out Category category);
             Enum.TryParse(dTO.GarmentStatus, out Status.GarmentStatus garmentStatus);
 
             var garmentToBeUpdated = _garmentRepository.GetById(dTO.Id);
-            if (garmentToBeUpdated != null)
+            if (garmentToBeUpdated == null)
             {
-                garmentToBeUpdated.Name = dTO.Name;
-                garmentToBeUpdated.Design = dTO.Design;
-                garmentToBeUpdated.CategoryType = category;
-                garmentToBeUpdated.Sizes = dTO.Sizes;
-                garmentToBeUpdated.BasePrice = dTO.BasePrice;
-                garmentToBeUpdated.GarmentStatus = garmentStatus;
-                garmentToBeUpdated.LaborHoursPerUnit = dTO.LaborHoursPerUnit;
-                garmentToBeUpdated.HourlyLaborRate = dTO.HourlyLaborRate;
-
-                _garmentRepository.Update(garmentToBeUpdated);
+                throw new InvalidOperationException("Garment not found.");
             }
 
+            garmentToBeUpdated.Name = dTO.Name;
+            garmentToBeUpdated.Design = dTO.Design;
+            garmentToBeUpdated.CategoryType = category;
+            garmentToBeUpdated.Sizes = dTO.Sizes;
+            garmentToBeUpdated.BasePrice = dTO.BasePrice;
+            garmentToBeUpdated.GarmentStatus = garmentStatus;
+            garmentToBeUpdated.LaborHoursPerUnit = dTO.LaborHoursPerUnit;
+            garmentToBeUpdated.HourlyLaborRate = dTO.HourlyLaborRate;
 
+            _garmentRepository.Update(garmentToBeUpdated);
         }
 
+        // Update the status of a garment
+        public void UpdateGarmentStatus(UpdateGarmentStatusDTO dTO)
+        {
+            Enum.TryParse(dTO.GarmentStatus, out Status.GarmentStatus garmentStatus);
+
+            var garmentToBeUpdated = _garmentRepository.GetById(dTO.Id);
+            if (garmentToBeUpdated == null)
+            {
+                throw new InvalidOperationException("Garment not found.");
+            }
+
+            garmentToBeUpdated.GarmentStatus = garmentStatus;
+            _garmentRepository.Update(garmentToBeUpdated);
+        }
+
+        // Update the category of a garment
+        public void UpdateCategory(UpdateCategoryDTO dTO)
+        {
+            Enum.TryParse(dTO.CategoryType, out Category category);
+
+            var garmentToBeUpdated = _garmentRepository.GetById(dTO.Id);
+            if (garmentToBeUpdated == null)
+            {
+                throw new InvalidOperationException("Garment not found.");
+            }
+
+            garmentToBeUpdated.CategoryType = category;
+            _garmentRepository.Update(garmentToBeUpdated);
+        }
+
+        // Delete a garment
         public void DeleteGarment(int id)
         {
             var garment = _garmentRepository.GetById(id);
-            if (garment != null)
+            if (garment == null)
             {
-                _garmentRepository.Delete(id);
+                throw new InvalidOperationException("Garment not found.");
             }
 
+            _garmentRepository.Delete(id);
         }
     }
 }

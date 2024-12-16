@@ -28,4 +28,20 @@ namespace Service.DTOs
     {
         public int Id { get; set; }
     }
+
+    public class UpdateGarmentStatusDTO
+    {
+        public int Id { get; set; }
+
+        [DefaultValue("Available | Discontinued")]
+        public string GarmentStatus { get; set; }
+    }
+    public class UpdateCategoryDTO
+    {
+        public int Id { get; set; }
+
+        [DefaultValue("Casual | SportsWear | Formal | Accessories")]
+        public string CategoryType { get; set; }
+
+    }
 }

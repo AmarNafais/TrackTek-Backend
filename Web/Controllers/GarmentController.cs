@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.DTOs;
 using Service;
+using Data.Entities.Enums;
 
 namespace Web.Controllers;
 
@@ -69,6 +70,36 @@ public class GarmentController : Controller
         {
             _garmentService.UpdateGarment(dTO);
             return Ok("Updated Garment Successfully");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Route("v1/Garment/UpdateGarmentStatus")]
+    [HttpPut]
+    public IActionResult UpdateGarmentStatus(UpdateGarmentStatusDTO dTO)
+    {
+        try
+        {
+            _garmentService.UpdateGarmentStatus(dTO);
+            return Ok("Updated Garment Status Successfully");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Route("v1/Garment/UpdateCategory")]
+    [HttpPut]
+    public IActionResult UpdateCategory(UpdateCategoryDTO dTO)
+    {
+        try
+        {
+            _garmentService.UpdateCategory(dTO);
+            return Ok("Updated Category Successfully");
         }
         catch (Exception ex)
         {
