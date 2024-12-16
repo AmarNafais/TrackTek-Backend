@@ -26,6 +26,8 @@ namespace Service
         private readonly IGarmentMaterialRepository _garmentMaterialRepository;
         private readonly IGarmentMachineRepository _garmentMachineRepository;
         private readonly ICostService _costService;
+        private readonly IReportService _reportService;
+        private readonly ICustomerRepository _customerRepository;
 
         public OrderService(
             IOrderRepository orderRepository,
@@ -34,7 +36,9 @@ namespace Service
             IGarmentRepository garmentRepository,
             IGarmentMaterialRepository garmentMaterialRepository,
             IGarmentMachineRepository garmentMachineRepository,
-            ICostService costService)
+            ICostService costService,
+            IReportService reportService,
+            ICustomerRepository customerRepository)
         {
             _orderRepository = orderRepository;
             _machineRepository = machineRepository;
@@ -43,6 +47,8 @@ namespace Service
             _garmentMaterialRepository = garmentMaterialRepository;
             _garmentMachineRepository = garmentMachineRepository;
             _costService = costService;
+            _reportService = reportService;
+            _customerRepository = customerRepository;
         }
 
         public object AddOrder(CreateOrderDTO dTO)
@@ -109,7 +115,7 @@ namespace Service
 
             var orderId = _orderRepository.Add(newOrder);
             _costService.CalculateCost(orderId);
-
+            _reportService.GenerateAndSaveReport(orderId);
             // Update Stock and Machine Status if the order is InProgress
             if (orderStatus == Status.OrderStatus.InProgress)
             {
@@ -146,15 +152,19 @@ namespace Service
         public object GetOrder(int id)
         {
             var order = _orderRepository.GetById(id);
+            var customer = _customerRepository.GetById(order.CustomerId);
+            var garment = _garmentRepository.GetById(order.GarmentId);
             return new
             {
                 order.Id,
                 order.CustomerId,
+                customer.CustomerName,
                 order.OrderDate,
                 order.DueDate,
                 order.TotalCost,
                 order.OrderStatus,
                 order.GarmentId,
+                garment.Name,
                 order.Quantity,
                 order.Size
             };
@@ -167,11 +177,13 @@ namespace Service
             {
                 order.Id,
                 order.CustomerId,
+                _customerRepository.GetById(order.CustomerId).CustomerName,
                 order.OrderDate,
                 order.DueDate,
                 order.TotalCost,
                 order.OrderStatus,
                 order.GarmentId,
+                _garmentRepository.GetById(order.GarmentId).Name,
                 order.Quantity,
                 order.Size
             });

@@ -10,7 +10,7 @@ namespace Data.Repositories
         long Add(GarmentMaterial garmentMaterial);
         GarmentMaterial GetById(int id);
         IEnumerable<GarmentMaterial> GetAll();
-        IEnumerable<GarmentMaterial> GetByGarmentId(int garmentId); // New method
+        IEnumerable<GarmentMaterial> GetByGarmentId(int garmentId); 
         void Update(GarmentMaterial garmentMaterial);
         void Delete(int id);
     }

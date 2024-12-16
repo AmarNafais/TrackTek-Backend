@@ -17,20 +17,20 @@ namespace Web.Controllers
             _costService = costService;
         }
 
-        [Route("v1/Cost/Create")]
-        [HttpPost]
-        public IActionResult CreateCost(CreateCostDTO dTO)
-        {
-            try
-            {
-                var costDetails = _costService.CalculateCost(dTO);
-                return Ok(costDetails);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        //[Route("v1/Cost/Create")]
+        //[HttpPost]
+        //public IActionResult CreateCost(CreateCostDTO dTO)
+        //{
+        //    try
+        //    {
+        //        var costDetails = _costService.CalculateCost(dTO);
+        //        return Ok(costDetails);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
 
         [Route("v1/Cost/GetById")]
         [HttpGet]
