@@ -22,6 +22,7 @@ namespace Web
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ICostService, CostService>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
@@ -36,6 +37,7 @@ namespace Web
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<ICostRepository, CostRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             // Configure SmtpSettings
             services.Configure<SMTPSetting>(services.BuildServiceProvider().GetService<IConfiguration>().GetSection("SmtpSettings"));

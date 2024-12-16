@@ -23,6 +23,7 @@ namespace Data.Repositories
         public DbSet<Order> Orders { get; set; }
         public DbSet<Cost> Costs { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<Notification> Notifications { get; set; }  
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
