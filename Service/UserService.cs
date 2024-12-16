@@ -9,6 +9,7 @@ public interface IUserService
     object GetUserById(int id);
     object GetAllUsers();
     void UpdateUser(UpdateUserDTO userDto);
+    void UpdateUserStatus(int userId);
     User GetUserByEmailAndPassword(string email, string password);
 }
 
@@ -64,6 +65,25 @@ public class UserService : IUserService
             updateUser.IsActive = userDto.IsActive;
             _userRepository.UpdateUser(updateUser);
         }
+    }
+
+    public void UpdateUserStatus(int userId)
+    {
+        var userToUpdate = _userRepository.GetByUserId(userId);
+        if (userToUpdate == null)
+        {
+            throw new InvalidOperationException("User not found.");
+        }
+
+        if (userToUpdate.IsActive == true)
+        {
+            userToUpdate.IsActive = false;
+        }
+        else
+        {
+            userToUpdate.IsActive = true;
+        }
+        _userRepository.UpdateUser(userToUpdate);
     }
 
     public User GetUserByEmailAndPassword(string email, string password)
