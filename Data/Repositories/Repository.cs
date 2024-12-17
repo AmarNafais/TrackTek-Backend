@@ -13,6 +13,18 @@ namespace Data.Repositories
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Machine> Machines { get; set; }
+        public DbSet<Material> Materials { get; set; }
+        public DbSet<Garment> Garments { get; set; }
+        public DbSet<GarmentMaterial> GarmentMaterials { get; set; }
+        public DbSet<GarmentMachine> GarmentMachines { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Cost> Costs { get; set; }
+        public DbSet<Report> Reports { get; set; }
+        public DbSet<Notification> Notifications { get; set; }  
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

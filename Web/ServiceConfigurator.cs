@@ -1,5 +1,6 @@
 ﻿using Data.Repositories;
 using Data.Entities;
+using Service;
 
 namespace Web
 {
@@ -11,10 +12,32 @@ namespace Web
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<ISupplierService, SupplierService>();
+            services.AddScoped<IMachineService, MachineService>();
+            services.AddScoped<IMaterialService, MaterialService>();
+            services.AddScoped<IGarmentService, GarmentService>();
+            services.AddScoped<IGarmentMaterialService, GarmentMaterialService>();
+            services.AddScoped<IGarmentMachineService, GarmentMachineService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<ICostService, CostService>();
+            services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<ISupplierRepository, SupplierRepository>();
+            services.AddScoped<IMachineRepository, MachineRepository>();
+            services.AddScoped<IMaterialRepository, MaterialRepository>();
+            services.AddScoped<IGarmentRepository, GarmentRepository>();
+            services.AddScoped<IGarmentMaterialRepository, GarmentMaterialRepository>();
+            services.AddScoped<IGarmentMachineRepository, GarmentMachineRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<ICostRepository, CostRepository>();
+            services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             // Configure SmtpSettings
             services.Configure<SMTPSetting>(services.BuildServiceProvider().GetService<IConfiguration>().GetSection("SmtpSettings"));

@@ -58,4 +58,19 @@ public class UserController : Controller
             return NotFound(ex.Message);
         }
     }
+
+    [Route("v1/User/UpdateUserStatus")]
+    [HttpPut]
+    public IActionResult UpdateUserStatus(int userId)
+    {
+        try
+        {
+            _userService.UpdateUserStatus(userId);
+            return Ok("Updated User Status Successfully");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
